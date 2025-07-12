@@ -1,21 +1,19 @@
 name: Update Stock Heatmap Data
 
 on:
-  # 1. 定时触发：使用标准的Cron语法，表示每15分钟运行一次
   schedule:
+    # 每15分钟运行一次
     - cron: '*/15 * * * *'
-  
-  # 2. 手动触发：允许我们在GitHub网站上手动运行此任务，方便调试
   workflow_dispatch:
+    # 允许在GitHub网站上手动触发此任务
 
 jobs:
   warmup-cache:
-    runs-on: ubuntu-latest # 使用最新的Ubuntu服务器来运行我们的任务
+    runs-on: ubuntu-latest
 
     steps:
-      # 第一步：使用curl命令，向我们部署在Vercel上的warmup API发送一个GET请求
       - name: Call Vercel warmup endpoint
         run: |
           curl --request GET \
-          --url 'https://heatmap-q5f93upq8-simon-pans-projects.vercel.app/api/warmup' \
+          --url 'https://您的最终域名/api/warmup' \
           --header 'x-warmup-secret: ${{ secrets.WARMUP_SECRET }}'

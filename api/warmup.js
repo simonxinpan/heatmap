@@ -7,7 +7,8 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (request, response) => {
-    // 【推荐】重新启用安全检查，防止被滥用
+    // 【推荐】启用安全检查，防止被滥用
+    // 注意：您需要在Vercel和GitHub Secrets中都设置 WARMUP_SECRET
     const secret = request.headers['x-warmup-secret'];
     if (secret !== process.env.WARMUP_SECRET) {
         return response.status(401).send('Unauthorized');
@@ -41,7 +42,7 @@ async function populateAllCaches() {
 
 async function updateCacheForList(key, stockList) {
     const processedData = await fetchDataForList(stockList);
-    if (processedData.length > 0) {
+    if (processedData && processedData.length > 0) {
         const { error } = await supabase
             .from('cache')
             .upsert({ key: key, value: processedData }, { onConflict: 'key' });
@@ -50,6 +51,8 @@ async function updateCacheForList(key, stockList) {
         } else {
             console.log(`    - SUCCESS: Cached ${processedData.length} stocks to Supabase for key: ${key}`);
         }
+    } else {
+        console.warn(`    - WARNING: No data fetched for key ${key}. Cache not updated.`);
     }
 }
 

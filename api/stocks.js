@@ -7,7 +7,9 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (request, response) => {
-    const url = new URL(request.url, `https://` + request.headers.host);
+    // Vercel的request对象没有完整的URL，需要拼接
+    const fullUrl = `https://${request.headers.host}${request.url}`;
+    const url = new URL(fullUrl);
     const ticker = url.searchParams.get('ticker');
     const sector = url.searchParams.get('sector');
 
@@ -36,6 +38,7 @@ module.exports = async (request, response) => {
             .single();
 
         if (error || !data) {
+            console.error(`Cache MISS or error fetching from Supabase for key ${cacheKey}:`, error);
             return response.status(404).json({ error: '缓存数据不存在或正在生成中。' });
         }
         
@@ -43,6 +46,7 @@ module.exports = async (request, response) => {
         return response.status(200).json(data.value);
         
     } catch (error) {
+        console.error(`API Handler Error:`, error.message);
         return response.status(500).json({ error: 'An internal server error occurred.' });
     }
 };
