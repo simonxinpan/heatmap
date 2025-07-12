@@ -3,6 +3,7 @@
   "version": "2.2.0",
   "private": true,
   "dependencies": {
+    "@supabase/supabase-js": "^2.50.5",
     "@upstash/redis": "^1.30.0"
   }
 }
