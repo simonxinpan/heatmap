@@ -7,8 +7,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (request, response) => {
-    // 【推荐】启用安全检查，防止被滥用
-    // 注意：您需要在Vercel和GitHub Secrets中都设置 WARMUP_SECRET
+    // 推荐的安全检查
     const secret = request.headers['x-warmup-secret'];
     if (secret !== process.env.WARMUP_SECRET) {
         return response.status(401).send('Unauthorized');
